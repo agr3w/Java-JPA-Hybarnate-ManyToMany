@@ -1,0 +1,8 @@
+service\UsuarioService.class
+util\HibernateUtil.class
+app\App.class
+entity\Usuario.class
+enumeration\OpcaoMenu.class
+app\App$1.class
+repository\UsuarioRepository.class
+util\TecladoUtil.class

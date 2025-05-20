@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<!-- JDBC Database connection settings -->
+		<!-- Exemplo de configuração no hibernate.cfg.xml -->
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/escola</property>
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.connection.password">root</property>
+
+		<!-- JDBC connection pool settings -->
+		<property name="hibernate.c3p0.min_size">5</property>
+		<property name="hibernate.c3p0.max_size">20</property>
+		<property name="hibernate.c3p0.timeout">300</property>
+		<property name="hibernate.c3p0.max_statements">50</property>
+		<property name="hibernate.c3p0.idle_test_period">3000</property>
+
+		<!-- SQL dialect -->
+		<property name="hibernate.dialect"></property>
+
+		<!-- Echo all executed SQL to stdout -->
+		<property name="hibernate.format_sql">true</property>
+
+		<!-- Drop and re-create the datorg.hibernate.dialect.MySQLDialectabase schema on startup -->
+		<property name="hibernate.hbm2ddl.auto">update</property>
+
+		<!-- Entities -->
+		<mapping class="entity.Usuario" />
+		<mapping class="entity.Endereco" />
+		<mapping class="entity.Pessoa" />
+		<mapping class="entity.Funcionario" />
+		<mapping class="entity.Departamento" />
+		    <!-- Mapeamento das entidades para o curso e aluno -->
+        <mapping class="entity.Aluno"/>
+        <mapping class="entity.Curso"/>
+
+	</session-factory>
+</hibernate-configuration>
