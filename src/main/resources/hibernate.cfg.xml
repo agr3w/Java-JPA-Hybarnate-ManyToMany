@@ -4,7 +4,7 @@
 	<session-factory>
 		<!-- JDBC Database connection settings -->
 		<!-- Exemplo de configuração no hibernate.cfg.xml -->
-		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/DataBase</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/manyToMany</property>
 		<property name="hibernate.connection.username">root</property>
 		<property name="hibernate.connection.password">root</property>
 
