@@ -11,16 +11,16 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 
 public class AlunoRepository {
-    
+
     private Session session;
-    
+
     public AlunoRepository() {
         this.session = new Configuration()
                 .configure("hibernate.cfg.xml")
                 .buildSessionFactory()
                 .openSession();
     }
-    
+
     public void inserir(Aluno aluno) {
         Transaction transaction = null;
         try {
@@ -28,13 +28,12 @@ public class AlunoRepository {
             session.persist(aluno);
             transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) {
+            if (transaction != null)
                 transaction.rollback();
-            }
-            System.out.println("Erro ao inserir aluno: " + e.getMessage());
+            throw new RuntimeException("Erro ao inserir aluno: " + e.getMessage());
         }
     }
-    
+
     public void atualizar(Aluno aluno) {
         Transaction transaction = null;
         try {
@@ -48,7 +47,7 @@ public class AlunoRepository {
             System.out.println("Erro ao atualizar aluno: " + e.getMessage());
         }
     }
-    
+
     public void remover(Long id) {
         Transaction transaction = null;
         try {
@@ -65,7 +64,7 @@ public class AlunoRepository {
             System.out.println("Erro ao remover aluno: " + e.getMessage());
         }
     }
-    
+
     public Aluno buscarPorId(Long id) {
         try {
             return session.find(Aluno.class, id);
@@ -74,7 +73,7 @@ public class AlunoRepository {
             return null;
         }
     }
-    
+
     public Aluno buscarPorCpf(String cpf) {
         try {
             return session.createQuery("FROM Aluno WHERE cpf = :cpf", Aluno.class)
@@ -85,7 +84,7 @@ public class AlunoRepository {
             return null;
         }
     }
-    
+
     public List<Aluno> listarTodos() {
         try {
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -97,7 +96,7 @@ public class AlunoRepository {
             return null;
         }
     }
-    
+
     public void close() {
         session.close();
     }

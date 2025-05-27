@@ -1,15 +1,15 @@
 package enumeration;
 
 public enum OpcaoMenu {
-    SAIR(0, "Saindo do sistema..."),
-    CADASTRAR(1, "Opção selecionada: Cadastrar Aluno"),
-    CADASTRAR_CURSO(2, "Opção selecionada: Cadastrar Curso"),
-    MATRICULAR(3, "Opção selecionada: Matricular Aluno"),
-    CANCELAR_MATRICULA(4, "Opção selecionada: Cancelar Matrícula"),
-    EXCLUIR_ALUNO(5, "Opção selecionada: Excluir Aluno"),
-    EXCLUIR_CURSO(6, "Opção selecionada: Excluir Curso"),
-    LISTAR_ALUNOS(7, "Opção selecionada: Listar Alunos"),
-    LISTAR_CURSOS(8, "Opção selecionada: Listar Cursos e Alunos"),
+    CADASTRAR(1, "Cadastrar aluno"),
+    EDITAR(2, "Cadastrar curso"),
+    REMOVER(5, "Excluir aluno"),
+    LISTAR_ALUNOS(7, "Listar alunos"),
+    PESQUISAR_PELO_CPF(3, "Matricular aluno"),
+    PESQUISAR_PELAS_INICIAIS(4, "Cancelar matrícula"),
+    LISTAR_CURSOS(8, "Listar cursos"),
+    EXCLUIR_CURSO(6, "Excluir curso"),
+    SAIR(0, "Sair"),
     INVALIDA(-1, "Opção inválida");
 
     private final int codigo;
