@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 
 import entity.Aluno;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -97,17 +98,22 @@ public class AlunoRepository {
         }
     }
 
-    public boolean verificarMatriculaExistente(Long idAluno, Long idCurso) {
-        try {
-            String hql = "SELECT COUNT(m) > 0 FROM Matricula m WHERE m.aluno.id = :idAluno AND m.curso.id = :idCurso";
-            return session.createQuery(hql, Boolean.class)
-                    .setParameter("idAluno", idAluno)
-                    .setParameter("idCurso", idCurso)
-                    .getSingleResult();
-        } catch (Exception e) {
-            return true; // Assume que já existe em caso de erro
-        }
+    // AlunoRepository.java - Método corrigido
+public boolean verificarMatriculaExistente(Long idAluno, Long idCurso) {
+    try {
+        // Consulta nativa na tabela de junção TB_Matricula
+        String sql = "SELECT COUNT(*) > 0 FROM TB_Matricula WHERE id_aluno = :idAluno AND id_curso = :idCurso";
+        
+        Query<Boolean> query = session.createNativeQuery(sql, Boolean.class);
+        query.setParameter("idAluno", idAluno);
+        query.setParameter("idCurso", idCurso);
+        
+        return query.getSingleResult();
+    } catch (Exception e) {
+        System.out.println("Erro ao verificar matrícula: " + e.getMessage());
+        return true; // Assume que já existe em caso de erro
     }
+}
 
     public void close() {
         session.close();

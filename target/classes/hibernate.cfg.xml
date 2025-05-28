@@ -4,9 +4,9 @@
 	<session-factory>
 		<!-- JDBC Database connection settings -->
 		<!-- Exemplo de configuração no hibernate.cfg.xml -->
-		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/escola</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/atividade2</property>
 		<property name="hibernate.connection.username">root</property>
-		<property name="hibernate.connection.password">root</property>
+		<property name="hibernate.connection.password">agr3w123</property>
 
 		<!-- JDBC connection pool settings -->
 		<property name="hibernate.c3p0.min_size">5</property>
@@ -25,14 +25,8 @@
 		<property name="hibernate.hbm2ddl.auto">update</property>
 
 		<!-- Entities -->
-		<mapping class="entity.Usuario" />
-		<mapping class="entity.Endereco" />
-		<mapping class="entity.Pessoa" />
-		<mapping class="entity.Funcionario" />
-		<mapping class="entity.Departamento" />
-		    <!-- Mapeamento das entidades para o curso e aluno -->
-        <mapping class="entity.Aluno"/>
-        <mapping class="entity.Curso"/>
+	        <mapping class="entity.Aluno"/>
+	        <mapping class="entity.Curso"/>
 
 	</session-factory>
 </hibernate-configuration>

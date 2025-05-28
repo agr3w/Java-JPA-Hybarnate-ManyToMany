@@ -20,6 +20,12 @@ public class MatriculaService {
         this.scanner = new Scanner(System.in);
     }
 
+    private boolean confirmarOperacao(String mensagem) {
+        System.out.print(mensagem + " (S/N)? ");
+        String resposta = scanner.nextLine().trim().toUpperCase();
+        return resposta.equals("S");
+    }
+
     public void cadastrarAluno() {
         try {
             System.out.println("\n--- Cadastro de Aluno ---");
@@ -48,6 +54,14 @@ public class MatriculaService {
                 throw new Exception("CPF já cadastrado!");
             }
 
+            // Confirmação dos dados
+            System.out.println("\nConfirme os dados:");
+            System.out.println("Nome: " + nome);
+            System.out.println("CPF: " + cpf);
+            if (!confirmarOperacao("Os dados estão corretos")) {
+                throw new Exception("Cadastro cancelado pelo usuário");
+            }
+
             // Cria e persiste o aluno
             Aluno novoAluno = new Aluno();
             novoAluno.setNome(nome);
@@ -57,26 +71,37 @@ public class MatriculaService {
             System.out.println("Aluno cadastrado com sucesso! ID: " + novoAluno.getId());
 
         } catch (Exception e) {
-            System.out.println("Erro ao cadastrar: " + e.getMessage());
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
     public void cadastrarCurso() {
-        System.out.println("\n--- Cadastro de Curso ---");
-        System.out.print("Nome do curso: ");
-        String nome = scanner.nextLine();
+        try {
+            System.out.println("\n--- Cadastro de Curso ---");
+            System.out.print("Nome do curso: ");
+            String nome = scanner.nextLine().trim();
 
-        // verifica se o curso ja existe
-        if (cursoRepository.buscarPorNome(nome) != null) {
-            System.out.println("Erro: Já existe um curso com este nome.");
-            return;
+            // verifica se o curso ja existe
+            if (cursoRepository.buscarPorNome(nome) != null) {
+                System.out.println("Já existe um curso com este nome.");
+                return;
+            }
+
+            // Confirmação
+            if (!confirmarOperacao("Confirmar criação do curso: " + nome)) {
+                System.out.println("Cadastro cancelado.");
+                return;
+            }
+
+            Curso curso = new Curso();
+            curso.setNome(nome);
+
+            cursoRepository.inserir(curso);
+            System.out.println("Curso cadastrado com sucesso!");
+
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
         }
-
-        Curso curso = new Curso();
-        curso.setNome(nome);
-
-        cursoRepository.inserir(curso);
-        System.out.println("Curso cadastrado com sucesso!");
     }
 
     public void matricularAluno() {
@@ -103,6 +128,12 @@ public class MatriculaService {
                 return;
             }
 
+            if (jaMatriculado) {
+                System.out.println("Aluno ID " + aluno.getId() +
+                        " já matriculado no curso ID " + curso.getId());
+                return;
+            }
+
             // Efetivar matrícula
             aluno.adicionarCurso(curso);
             alunoRepository.atualizar(aluno);
@@ -116,22 +147,22 @@ public class MatriculaService {
     public void cancelarMatricula() {
         try {
             System.out.println("\n--- Cancelar Matrícula ---");
-
-            // Confirmação do aluno
             Aluno aluno = confirmarAlunoPorCPF();
 
-            // Listar cursos matriculados
             List<Curso> cursosMatriculados = aluno.getCursos();
             if (cursosMatriculados.isEmpty()) {
                 System.out.println("Aluno não possui matrículas ativas.");
                 return;
             }
 
-            // Seleção do curso para cancelamento
             System.out.println("Cursos matriculados:");
             Curso curso = selecionarCursoPorMenu(cursosMatriculados);
 
-            // Cancelar matrícula
+            // Confirmação adicional
+            if (!confirmarOperacao("Confirmar cancelamento da matrícula em " + curso.getNome())) {
+                throw new Exception("Operação cancelada.");
+            }
+
             aluno.removerCurso(curso);
             alunoRepository.atualizar(aluno);
             System.out.println("Matrícula cancelada com sucesso!");
@@ -144,8 +175,6 @@ public class MatriculaService {
     public void excluirAluno() {
         try {
             System.out.println("\n--- Excluir Aluno ---");
-
-            // Confirmação do aluno
             Aluno aluno = confirmarAlunoPorCPF();
 
             // Verificar matrículas ativas
@@ -153,15 +182,11 @@ public class MatriculaService {
                 throw new Exception("Não é possível excluir aluno com matrículas ativas.");
             }
 
-            // Confirmação final
-            System.out.print("Tem certeza que deseja excluir este aluno (S/N)? ");
-            String resposta = scanner.nextLine().trim().toUpperCase();
-
-            if (!resposta.equals("S")) {
+            // Confirmação adicional
+            if (!confirmarOperacao("Tem certeza que deseja excluir o aluno " + aluno.getNome())) {
                 throw new Exception("Operação cancelada.");
             }
 
-            // Exclusão
             alunoRepository.remover(aluno.getId());
             System.out.println("Aluno excluído com sucesso!");
 
@@ -172,8 +197,9 @@ public class MatriculaService {
 
     public void excluirCurso() {
         try {
+            System.out.println("\n--- Excluir Curso ---");
             System.out.print("Nome do curso: ");
-            String nome = scanner.nextLine();
+            String nome = scanner.nextLine().trim();
             Curso curso = cursoRepository.buscarPorNome(nome);
 
             if (curso == null) {
@@ -182,6 +208,11 @@ public class MatriculaService {
 
             if (!curso.getAlunos().isEmpty()) {
                 throw new Exception("Não é possível excluir curso com alunos matriculados!");
+            }
+
+            // Confirmação adicional
+            if (!confirmarOperacao("Tem certeza que deseja excluir o curso " + curso.getNome())) {
+                throw new Exception("Operação cancelada.");
             }
 
             cursoRepository.remover(curso.getId());
