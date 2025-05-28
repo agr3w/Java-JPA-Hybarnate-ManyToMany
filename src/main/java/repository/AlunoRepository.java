@@ -97,6 +97,18 @@ public class AlunoRepository {
         }
     }
 
+    public boolean verificarMatriculaExistente(Long idAluno, Long idCurso) {
+        try {
+            String hql = "SELECT COUNT(m) > 0 FROM Matricula m WHERE m.aluno.id = :idAluno AND m.curso.id = :idCurso";
+            return session.createQuery(hql, Boolean.class)
+                    .setParameter("idAluno", idAluno)
+                    .setParameter("idCurso", idCurso)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return true; // Assume que já existe em caso de erro
+        }
+    }
+
     public void close() {
         session.close();
     }

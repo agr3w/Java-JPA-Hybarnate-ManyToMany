@@ -64,7 +64,6 @@ public class AppMatricula {
         matriculaService.close();
         scanner.close();
     }
-
     private static void exibirMenu() {
         System.out.println("\n========== SISTEMA DE MATRÍCULAS ==========");
         System.out.println("1 - Cadastrar aluno");

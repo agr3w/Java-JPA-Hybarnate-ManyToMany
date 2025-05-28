@@ -96,8 +96,9 @@ public class MatriculaService {
             // Seleção do curso
             Curso curso = selecionarCursoPorMenu(cursos);
 
-            // Verificar matrícula existente
-            if (aluno.getCursos().contains(curso)) {
+            // Verificação no banco de dados (não apenas em memória)
+            boolean jaMatriculado = alunoRepository.verificarMatriculaExistente(aluno.getId(), curso.getId());
+            if (jaMatriculado) {
                 System.out.println("Aluno já está matriculado neste curso.");
                 return;
             }
