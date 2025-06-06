@@ -4,7 +4,7 @@
 	<session-factory>
 		<!-- JDBC Database connection settings -->
 		<!-- Exemplo de configuração no hibernate.cfg.xml -->
-		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/atividade2</property>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ManyToMany</property>
 		<property name="hibernate.connection.username">root</property>
 		<property name="hibernate.connection.password">agr3w123</property>
 
@@ -27,6 +27,5 @@
 		<!-- Entities -->
 	        <mapping class="entity.Aluno"/>
 	        <mapping class="entity.Curso"/>
-
 	</session-factory>
 </hibernate-configuration>

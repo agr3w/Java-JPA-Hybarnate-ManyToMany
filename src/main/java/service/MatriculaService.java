@@ -187,7 +187,7 @@ public class MatriculaService {
                 throw new Exception("Operação cancelada.");
             }
 
-            alunoRepository.remover(aluno.getId());
+            alunoRepository.remover(aluno);
             System.out.println("Aluno excluído com sucesso!");
 
         } catch (Exception e) {
@@ -215,7 +215,7 @@ public class MatriculaService {
                 throw new Exception("Operação cancelada.");
             }
 
-            cursoRepository.remover(curso.getId());
+            cursoRepository.remover(curso);
             System.out.println("Curso excluído com sucesso!");
         } catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
@@ -265,8 +265,6 @@ public class MatriculaService {
 
     public void close() {
         try {
-            alunoRepository.close();
-            cursoRepository.close();
             scanner.close();
         } catch (Exception e) {
             System.out.println("Erro ao fechar recursos: " + e.getMessage());
