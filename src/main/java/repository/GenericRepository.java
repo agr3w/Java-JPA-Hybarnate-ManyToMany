@@ -53,7 +53,7 @@ public class GenericRepository<T> {
 
     public List<T> pesquisarTodos() {
         List<T> registros = new ArrayList<>();
-        try {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaQuery<T> criteria = builder.createQuery(entityClass);
             criteria.from(entityClass);

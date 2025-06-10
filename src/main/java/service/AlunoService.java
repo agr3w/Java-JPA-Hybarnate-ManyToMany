@@ -52,15 +52,18 @@ public class AlunoService {
     public void remover(String cpf) {
         try {
             Aluno aluno = alunoRepository.buscarPorCpf(cpf);
-            if (aluno == null)
-                throw new Exception("Aluno não encontrado! Verifique o CPF informado.");
-            if (!aluno.getCursos().isEmpty())
-                throw new Exception(
-                        "Não é possível excluir aluno com matrículas ativas. Por favor, cancele as matrículas primeiro.");
+            if (aluno == null) {
+                System.out.println("Aluno não encontrado!");
+                return;
+            }
+            if (aluno.getCursos() != null && !aluno.getCursos().isEmpty()) {
+                System.out.println("Não é possível excluir o aluno pois ele está matriculado em um ou mais cursos.");
+                return;
+            }
             alunoRepository.remover(aluno);
             System.out.println("Aluno excluído com sucesso!");
         } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            System.out.println("Erro ao excluir aluno: " + e.getMessage());
         }
     }
 

@@ -28,7 +28,7 @@ public class CursoService {
     public void listarComAlunos() {
         try {
             System.out.println("\n--- Lista de Cursos e Alunos ---");
-            List<Curso> cursos = cursoRepository.listarTodos();
+            List<Curso> cursos = cursoRepository.listarTodosComAlunos();
             if (cursos.isEmpty()) {
                 System.out.println("Nenhum curso cadastrado." +
                         " Por favor, cadastre um curso primeiro.");
