@@ -35,7 +35,6 @@ public class Aluno implements Serializable {
             "id_aluno", "id_curso" }))
     private List<Curso> cursos = new ArrayList<>();
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }

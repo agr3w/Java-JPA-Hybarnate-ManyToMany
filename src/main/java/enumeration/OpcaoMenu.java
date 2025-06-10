@@ -1,22 +1,24 @@
 package enumeration;
 
 public enum OpcaoMenu {
-    CADASTRAR(1, "Cadastrar aluno"),
-    EDITAR(2, "Cadastrar curso"),
-    REMOVER(5, "Excluir aluno"),
-    LISTAR_ALUNOS(7, "Listar alunos"),
-    PESQUISAR_PELO_CPF(3, "Matricular aluno"),
-    PESQUISAR_PELAS_INICIAIS(4, "Cancelar matrícula"),
-    LISTAR_CURSOS(8, "Listar cursos"),
-    EXCLUIR_CURSO(6, "Excluir curso"),
-    SAIR(0, "Sair"),
-    INVALIDA(-1, "Opção inválida");
+    SAIR(0, "0 - Sair", "Opção selecionada: Sair"),
+    CADASTRAR_ALUNO(1, "1 - Cadastrar Aluno", "Opção selecionada: Cadastrar Aluno"),
+    CADASTRAR_CURSO(2, "2 - Cadastrar Curso", "Opção selecionada: Cadastrar Curso"),
+    REALIZAR_MATRICULA(3, "3 - Matricular aluno no curso", "Opção selecionada: Matricular aluno no Curso"),
+    CANCELAR_MATRICULA(4, "4 - Cancelar matrícula", "Opção selecionada: Cancelar matrícula"),
+    EXCLUIR_ALUNO(5, "5 - Excluir aluno", "Opção selecionada: Excluir aluno"),
+    EXCLUIR_CURSO(6, "6 - Excluir curso", "Opção selecionada: Excluir curso"),
+    LISTAR_ALUNOS(7, "7 - Listar alunos", "Opção selecionada: Listar alunos"),
+    LISTAR_CURSOS(8, "8 - Listar todos os cursos e seus respectivos alunos", "Opção selecionada: Listar cursos"),
+    OPCAO_INVALIDA(-1, "", "Opção inválida");
 
     private final int codigo;
+    private final String nome;
     private final String descricao;
 
-    OpcaoMenu(int codigo, String descricao) {
+    OpcaoMenu(int codigo, String nome, String descricao) {
         this.codigo = codigo;
+        this.nome = nome;
         this.descricao = descricao;
     }
 
@@ -24,61 +26,20 @@ public enum OpcaoMenu {
         return codigo;
     }
 
+    public String getNome() {
+        return nome;
+    }
+
     public String getDescricao() {
         return descricao;
     }
 
-    public static OpcaoMenu obterPorCodigo(int codigo) {
+    public static OpcaoMenu obterPorCodigo(long codigo) {
         for (OpcaoMenu opcao : OpcaoMenu.values()) {
             if (opcao.getCodigo() == codigo) {
                 return opcao;
             }
         }
-        return INVALIDA;
+        return OPCAO_INVALIDA;
     }
 }
-
-
-/*
-public enum OpcaoMenu {
-	SAIR(0, "Opção selecionada: Cadastrar"),
-	CADASTRAR(1, "Opção selecionada: Cadastrar"),
-	EDITAR(2, "Opção selecionada: Editar"),
-	REMOVER(3, "Opção selecionada: Remover"),
-	PESQUISAR_TODOS(4, "Opção selecionada: Pesquisar todos"),
-	PESQUISAR_PELO_CPF(5, "Opção selecionada: Pesquisar pelo CPF"),
-	PESQUISAR_PELAS_INICIAIS(6, "Opção selecionada: Pesquisar pelas iniciais"),
-	INVALIDA(-1, "Opção inválida");
-	
-	private final int codigo;
-	private final String descricao;
-
-	// Construtor do enum
-	OpcaoMenu(int codigo, String descricao) {
-		this.codigo = codigo;
-		this.descricao = descricao;
-	}
-
-    // Método para obter o código da opção
-    public int getCodigo() {
-        return codigo;
-    }
-
-    // Método para obter a descrição da opção
-    public String getDescricao() {
-        return descricao;
-    }
-
-    // Método estático para buscar a opção pelo código
-    public static OpcaoMenu obterPorCodigo(int codigo) {
-        for (OpcaoMenu opcao : OpcaoMenu.values()) {
-            if (opcao.getCodigo() == codigo) {
-                return opcao;
-            }
-        }
-        return INVALIDA;
-    }  
-	}
-}
-
-*/

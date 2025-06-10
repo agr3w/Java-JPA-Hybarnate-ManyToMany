@@ -2,77 +2,18 @@ package repository;
 
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
 import entity.Aluno;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 
-public class AlunoRepository {
-
-    private Session session;
+public class AlunoRepository extends GenericRepository<Aluno> {
 
     public AlunoRepository() {
-        this.session = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .buildSessionFactory()
-                .openSession();
-    }
-
-    public void inserir(Aluno aluno) {
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            session.persist(aluno);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null)
-                transaction.rollback();
-            throw new RuntimeException("Erro ao inserir aluno: " + e.getMessage());
-        }
-    }
-
-    public void atualizar(Aluno aluno) {
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            session.merge(aluno);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            System.out.println("Erro ao atualizar aluno: " + e.getMessage());
-        }
-    }
-
-    public void remover(Long id) {
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            Aluno aluno = session.find(Aluno.class, id);
-            if (aluno != null) {
-                session.remove(aluno);
-            }
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            System.out.println("Erro ao remover aluno: " + e.getMessage());
-        }
+        super(Aluno.class);
     }
 
     public Aluno buscarPorId(Long id) {
-        try {
-            return session.find(Aluno.class, id);
-        } catch (Exception e) {
-            System.out.println("Erro ao buscar aluno por ID: " + e.getMessage());
-            return null;
-        }
+        return pesquisaPeloId(id);
     }
 
     public Aluno buscarPorCpf(String cpf) {
@@ -87,35 +28,19 @@ public class AlunoRepository {
     }
 
     public List<Aluno> listarTodos() {
+        return pesquisarTodos();
+    }
+
+    public boolean verificarMatriculaExistente(Long idAluno, Long idCurso) {
         try {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<Aluno> criteria = builder.createQuery(Aluno.class);
-            criteria.from(Aluno.class);
-            return session.createQuery(criteria).getResultList();
+            String sql = "SELECT COUNT(*) > 0 FROM TB_Matricula WHERE id_aluno = :idAluno AND id_curso = :idCurso";
+            Query<Boolean> query = session.createNativeQuery(sql, Boolean.class);
+            query.setParameter("idAluno", idAluno);
+            query.setParameter("idCurso", idCurso);
+            return query.getSingleResult();
         } catch (Exception e) {
-            System.out.println("Erro ao listar alunos: " + e.getMessage());
-            return null;
+            System.out.println("Erro ao verificar matrícula: " + e.getMessage());
+            return true;
         }
-    }
-
-    // AlunoRepository.java - Método corrigido
-public boolean verificarMatriculaExistente(Long idAluno, Long idCurso) {
-    try {
-        // Consulta nativa na tabela de junção TB_Matricula
-        String sql = "SELECT COUNT(*) > 0 FROM TB_Matricula WHERE id_aluno = :idAluno AND id_curso = :idCurso";
-        
-        Query<Boolean> query = session.createNativeQuery(sql, Boolean.class);
-        query.setParameter("idAluno", idAluno);
-        query.setParameter("idCurso", idCurso);
-        
-        return query.getSingleResult();
-    } catch (Exception e) {
-        System.out.println("Erro ao verificar matrícula: " + e.getMessage());
-        return true; // Assume que já existe em caso de erro
-    }
-}
-
-    public void close() {
-        session.close();
     }
 }
