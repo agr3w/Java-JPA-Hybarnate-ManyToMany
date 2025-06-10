@@ -4,36 +4,26 @@ import java.util.List;
 import java.util.Scanner;
 
 import entity.Aluno;
-import entity.Curso;
 import repository.AlunoRepository;
-import repository.CursoRepository;
 
 public class AlunoService {
 
     private AlunoRepository alunoRepository = new AlunoRepository();
-    private CursoRepository cursoRepository = new CursoRepository();
+
     private Scanner scanner = new Scanner(System.in);
 
-    public void cadastrar(Aluno aluno) throws Exception {
+    public void cadastrar(String nome, String cpf, boolean confirmado) {
+        if (!confirmado) {
+            System.out.println("Cadastro cancelado pelo usuário.");
+            return;
+        }
         try {
-            System.out.println("\n--- Cadastro de Aluno ---");
-            System.out.print("Nome: ");
-            String nome = scanner.nextLine().trim();
             if (nome.isBlank() || nome.length() > 100)
-                throw new Exception("Nome inválido!");
-
-            System.out.print("CPF (apenas números): ");
-            String cpf = scanner.nextLine().trim();
+                throw new Exception("Nome inválido! O nome deve ter até 100 caracteres.");
             if (cpf.length() != 11 || !cpf.matches("\\d+"))
-                throw new Exception("CPF inválido!");
-
+                throw new Exception("CPF inválido! O CPF deve ter 11 dígitos numéricos.");
             if (alunoRepository.buscarPorCpf(cpf) != null)
-                throw new Exception("CPF já cadastrado!");
-
-            System.out.println("Nome: " + nome);
-            System.out.println("CPF: " + cpf);
-            if (!confirmarOperacao("Os dados estão corretos"))
-                throw new Exception("Cadastro cancelado");
+                throw new Exception("CPF já cadastrado! Por favor, informe outro CPF.");
 
             Aluno novoAluno = new Aluno();
             novoAluno.setNome(nome);
@@ -50,7 +40,7 @@ public class AlunoService {
         System.out.println("\n--- Lista de Alunos ---");
         List<Aluno> alunos = alunoRepository.listarTodos();
         if (alunos == null || alunos.isEmpty()) {
-            System.out.println("Nenhum aluno cadastrado.");
+            System.out.println("Nenhum aluno cadastrado. Por favor, cadastre um aluno primeiro.");
             return alunos;
         }
         for (Aluno aluno : alunos) {
@@ -59,14 +49,14 @@ public class AlunoService {
         return alunos;
     }
 
-    public void remover() {
+    public void remover(String cpf) {
         try {
-            System.out.println("\n--- Excluir Aluno ---");
-            Aluno aluno = confirmarAlunoPorCPF();
+            Aluno aluno = alunoRepository.buscarPorCpf(cpf);
+            if (aluno == null)
+                throw new Exception("Aluno não encontrado! Verifique o CPF informado.");
             if (!aluno.getCursos().isEmpty())
-                throw new Exception("Não é possível excluir aluno com matrículas ativas.");
-            if (!confirmarOperacao("Tem certeza que deseja excluir o aluno " + aluno.getNome()))
-                throw new Exception("Operação cancelada.");
+                throw new Exception(
+                        "Não é possível excluir aluno com matrículas ativas. Por favor, cancele as matrículas primeiro.");
             alunoRepository.remover(aluno);
             System.out.println("Aluno excluído com sucesso!");
         } catch (Exception e) {
@@ -74,73 +64,12 @@ public class AlunoService {
         }
     }
 
-    public void matricular() {
-        try {
-            System.out.println("\n--- Matricular Aluno em Curso ---");
-            Aluno aluno = confirmarAlunoPorCPF();
-            List<Curso> cursos = cursoRepository.listarTodos();
-            if (cursos.isEmpty()) {
-                System.out.println("Nenhum curso disponível para matrícula.");
-                return;
-            }
-            Curso curso = selecionarCursoPorMenu(cursos);
-            boolean jaMatriculado = alunoRepository.verificarMatriculaExistente(aluno.getId(), curso.getId());
-            if (jaMatriculado) {
-                System.out.println("Aluno já está matriculado neste curso.");
-                return;
-            }
-            aluno.adicionarCurso(curso);
-            alunoRepository.atualizar(aluno);
-            System.out.println("Matrícula realizada com sucesso!");
-        } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
-        }
-    }
-
-    public void cancelarMatricula() {
-        try {
-            System.out.println("\n--- Cancelar Matrícula ---");
-            Aluno aluno = confirmarAlunoPorCPF();
-            List<Curso> cursosMatriculados = aluno.getCursos();
-            if (cursosMatriculados.isEmpty()) {
-                System.out.println("Aluno não possui matrículas ativas.");
-                return;
-            }
-            Curso curso = selecionarCursoPorMenu(cursosMatriculados);
-            if (!confirmarOperacao("Confirmar cancelamento da matrícula em " + curso.getNome()))
-                throw new Exception("Operação cancelada.");
-            aluno.removerCurso(curso);
-            alunoRepository.atualizar(aluno);
-            System.out.println("Matrícula cancelada com sucesso!");
-        } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
-        }
-    }
-
-    private boolean confirmarOperacao(String mensagem) {
-        System.out.print(mensagem + " (S/N)? ");
-        String resposta = scanner.nextLine().trim().toUpperCase();
-        return resposta.equals("S");
-    }
-
-    private Curso selecionarCursoPorMenu(List<Curso> cursos) throws Exception {
-        System.out.println("\nCursos disponíveis:");
-        for (int i = 0; i < cursos.size(); i++) {
-            System.out.println((i + 1) + " - " + cursos.get(i).getNome());
-        }
-        System.out.print("Selecione o número do curso: ");
-        int escolha = Integer.parseInt(scanner.nextLine()) - 1;
-        if (escolha < 0 || escolha >= cursos.size())
-            throw new Exception("Opção inválida!");
-        return cursos.get(escolha);
-    }
-
-    private Aluno confirmarAlunoPorCPF() throws Exception {
+    public Aluno confirmarAlunoPorCPF() throws Exception {
         System.out.print("CPF do aluno: ");
         String cpf = scanner.nextLine().trim();
         Aluno aluno = alunoRepository.buscarPorCpf(cpf);
         if (aluno == null)
-            throw new Exception("Aluno não encontrado.");
+            throw new Exception("Aluno não encontrado! Verifique o CPF informado.");
         System.out.println("Aluno encontrado: " + aluno.getNome());
         System.out.print("Confirmar (S/N)? ");
         String resposta = scanner.nextLine().trim().toUpperCase();

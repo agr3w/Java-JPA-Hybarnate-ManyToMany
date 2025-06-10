@@ -1,7 +1,6 @@
 package service;
 
 import java.util.List;
-import java.util.Scanner;
 
 import entity.Curso;
 import repository.CursoRepository;
@@ -9,21 +8,14 @@ import repository.CursoRepository;
 public class CursoService {
 
     private CursoRepository cursoRepository = new CursoRepository();
-    private Scanner scanner = new Scanner(System.in);
 
-    public void cadastrar() {
+    public void cadastrar(String nome) {
         try {
-            System.out.println("\n--- Cadastro de Curso ---");
-            System.out.print("Nome do curso: ");
-            String nome = scanner.nextLine().trim();
-            if (cursoRepository.buscarPorNome(nome) != null) {
-                System.out.println("Já existe um curso com este nome.");
-                return;
-            }
-            if (!confirmarOperacao("Confirmar criação do curso: " + nome)) {
-                System.out.println("Cadastro cancelado.");
-                return;
-            }
+            if (nome == null || nome.isBlank() || nome.length() > 100)
+                throw new Exception("Nome do curso inválido! O nome deve ter até 100 caracteres. ");
+            if (cursoRepository.buscarPorNome(nome) != null)
+                throw new Exception("Já existe um curso com este nome. Por favor, escolha outro nome.");
+
             Curso curso = new Curso();
             curso.setNome(nome);
             cursoRepository.inserir(curso);
@@ -38,18 +30,18 @@ public class CursoService {
             System.out.println("\n--- Lista de Cursos e Alunos ---");
             List<Curso> cursos = cursoRepository.listarTodos();
             if (cursos.isEmpty()) {
-                System.out.println("Nenhum curso cadastrado.");
+                System.out.println("Nenhum curso cadastrado." +
+                        " Por favor, cadastre um curso primeiro.");
                 return;
             }
             for (Curso curso : cursos) {
                 System.out.println("\nCurso: " + curso.getNome() + " (ID: " + curso.getId() + ")");
                 System.out.println("Alunos matriculados (" + curso.getAlunos().size() + "):");
                 if (curso.getAlunos().isEmpty()) {
-                    System.out.println("  Nenhum aluno matriculado.");
+                    System.out.println("  Nenhum aluno matriculado. Por favor, cadastre alunos primeiro.");
                 } else {
-                    curso.getAlunos().forEach(aluno -> 
-                        System.out.println("  - " + aluno.getNome() + " (CPF: " + aluno.getCpf() + ")")
-                    );
+                    curso.getAlunos().forEach(
+                            aluno -> System.out.println("  - " + aluno.getNome() + " (CPF: " + aluno.getCpf() + ")"));
                 }
             }
         } catch (Exception e) {
@@ -57,15 +49,14 @@ public class CursoService {
         }
     }
 
-    public void remover() {
+    public void remover(String nome) {
         try {
-            System.out.println("\n--- Excluir Curso ---");
-            System.out.print("Nome do curso: ");
-            String nome = scanner.nextLine().trim();
             Curso curso = cursoRepository.buscarPorNome(nome);
-            if (curso == null) throw new Exception("Curso não encontrado!");
-            if (!curso.getAlunos().isEmpty()) throw new Exception("Não é possível excluir curso com alunos matriculados!");
-            if (!confirmarOperacao("Tem certeza que deseja excluir o curso " + curso.getNome())) throw new Exception("Operação cancelada.");
+            if (curso == null)
+                throw new Exception("Curso não encontrado! Verifique o nome informado.");
+            if (!curso.getAlunos().isEmpty())
+                throw new Exception(
+                        "Não é possível excluir curso com alunos matriculados! Por favor, cancele as matrículas primeiro.");
             cursoRepository.remover(curso);
             System.out.println("Curso excluído com sucesso!");
         } catch (Exception e) {
@@ -73,9 +64,20 @@ public class CursoService {
         }
     }
 
-    private boolean confirmarOperacao(String mensagem) {
-        System.out.print(mensagem + " (S/N)? ");
-        String resposta = scanner.nextLine().trim().toUpperCase();
-        return resposta.equals("S");
+    public List<Curso> listarTodos() {
+        return cursoRepository.listarTodos();
+    }
+
+    public Curso selecionarCursoPorMenu(List<Curso> cursos) throws Exception {
+        System.out.println("\nCursos disponíveis:");
+        for (int i = 0; i < cursos.size(); i++) {
+            System.out.println((i + 1) + " - " + cursos.get(i).getNome());
+        }
+        System.out.print("Selecione o número do curso: ");
+        int escolha = Integer.parseInt(util.TecladoUtil.leitura().trim()) - 1;
+        if (escolha < 0 || escolha >= cursos.size()) {
+            throw new Exception("Opção inválida!");
+        }
+        return cursos.get(escolha);
     }
 }

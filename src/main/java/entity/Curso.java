@@ -15,19 +15,18 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "TB_Curso")
 public class Curso implements Serializable {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_curso")
     private Long id;
-    
+
     @Column(name = "nome", length = 50, nullable = false, unique = true)
     private String nome;
-    
+
     @ManyToMany(mappedBy = "cursos")
     private List<Aluno> alunos = new ArrayList<>();
 
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -51,7 +50,7 @@ public class Curso implements Serializable {
     public void setAlunos(List<Aluno> alunos) {
         this.alunos = alunos;
     }
-    
+
     @Override
     public String toString() {
         return "Curso [id=" + id + ", nome=" + nome + "]";

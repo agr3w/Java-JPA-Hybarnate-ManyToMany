@@ -40,7 +40,7 @@ public class AlunoRepository extends GenericRepository<Aluno> {
             return query.getSingleResult();
         } catch (Exception e) {
             System.out.println("Erro ao verificar matrícula: " + e.getMessage());
-            return true; // Assume que já existe em caso de erro
+            return true;
         }
     }
 }

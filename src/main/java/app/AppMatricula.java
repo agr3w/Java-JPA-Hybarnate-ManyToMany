@@ -1,19 +1,21 @@
 package app;
 
-import java.util.List;
-import entity.Aluno;
 import enumeration.OpcaoMenu;
 import service.AlunoService;
 import service.CursoService;
-
-import java.util.Scanner;
+import service.MatriculaService;
+import util.TecladoUtil;
 
 public class AppMatricula {
 
     private static AlunoService alunoService = new AlunoService();
     private static CursoService cursoService = new CursoService();
-    private static Scanner scanner = new Scanner(System.in);
+    private static MatriculaService matriculaService = new MatriculaService();
 
+    /**
+     * Método principal que inicia o sistema de matrícula.
+     * Ele exibe o menu e processa as opções selecionadas pelo usuário.
+     */
     public static void main(String[] args) {
         for (;;) {
             imprimirMenu();
@@ -29,16 +31,18 @@ public class AppMatricula {
                 case LISTAR_CURSOS -> listarCursos();
                 case SAIR -> {
                     System.out.println("Encerrando o sistema...");
-                    fecharRecursos();
                     return;
                 }
-                default -> System.out.println("Atenção: Opção inválida!");
+                default -> System.out.println("Atenção: Opção inválida! Por favor, escolha uma opção válida.");
             }
             System.out.println("\nPressione Enter para continuar...");
-            scanner.nextLine();
+            TecladoUtil.leitura(); // Agora usando o utilitário para aguardar o Enter
         }
     }
 
+    /**
+     * Método para imprimir o menu principal.
+     */
     private static void imprimirMenu() {
         System.out.println("=========================");
         System.out.println("MENU PRINCIPAL");
@@ -51,83 +55,81 @@ public class AppMatricula {
         System.out.println("=========================");
     }
 
-    private static String leituraTecladoTexto(String mensagem) {
-        System.out.print(mensagem);
-        return scanner.nextLine();
-    }
-
-    private static long leituraTecladoNumerico(String mensagem) {
-        long numeroDigitado = 0;
-        try {
-            System.out.print(mensagem);
-            String valorDigitado = scanner.nextLine();
-            numeroDigitado = Long.parseLong(valorDigitado);
-            return numeroDigitado;
-        } catch (Exception e) {
-            System.out.println("Atenção: Você deve digitar um valor numérico!");
-            numeroDigitado = leituraTecladoNumerico(mensagem);
-        }
-        return numeroDigitado;
-    }
-
+    /**
+     * Método para ler a opção do menu.
+     */
     private static OpcaoMenu lerOpcaoMenu() {
-        long opcaoDigitada = leituraTecladoNumerico("Informe a opção desejada: ");
+        long opcaoDigitada = TecladoUtil.leituraLong("Informe a opção desejada: ");
         return OpcaoMenu.obterPorCodigo(opcaoDigitada);
     }
 
+    /**
+     * Método para cadastrar um aluno.
+     */
     private static void cadastrarAluno() {
         System.out.println(OpcaoMenu.CADASTRAR_ALUNO.getDescricao());
-        Aluno aluno = new Aluno();
-        try {
-            alunoService.cadastrar(aluno);
-        } catch (Exception e) {
-            System.out.println("ERRO: " + e.getMessage());
-        }
+        System.out.print("Nome: ");
+        String nome = TecladoUtil.leitura().trim();
+        System.out.print("CPF (apenas números): ");
+        String cpf = TecladoUtil.leitura().trim();
+        boolean confirmado = TecladoUtil.confirmar("Deseja realmente cadastrar este aluno");
+        alunoService.cadastrar(nome, cpf, confirmado);
     }
 
-    private static void cadastrarCurso() {
-        System.out.println(OpcaoMenu.CADASTRAR_CURSO.getDescricao());
-        cursoService.cadastrar();
-    }
-
+    /**
+     * Método para excluir um aluno.
+     */
     private static void excluirAluno() {
         System.out.println(OpcaoMenu.EXCLUIR_ALUNO.getDescricao());
-        alunoService.remover();
+        System.out.print("CPF do aluno: ");
+        String cpf = TecladoUtil.leitura().trim();
+        alunoService.remover(cpf);
     }
 
+    /**
+     * Método para cadastrar um curso.
+     */
+    private static void cadastrarCurso() {
+        System.out.println(OpcaoMenu.CADASTRAR_CURSO.getDescricao());
+        System.out.print("Nome do curso: ");
+        String nome = TecladoUtil.leitura().trim();
+        if (!TecladoUtil.confirmar("Deseja realmente cadastrar este curso")) {
+            System.out.println("Cadastro cancelado pelo usuário.");
+            return;
+        }
+
+        cursoService.cadastrar(nome);
+    }
+
+    /** Método para excluir um curso */
     private static void excluirCurso() {
         System.out.println(OpcaoMenu.EXCLUIR_CURSO.getDescricao());
-        cursoService.remover();
-    }
-
-    private static void listarAlunos() {
-        List<Aluno> alunos = alunoService.listar();
-        if (alunos == null || alunos.isEmpty()) {
-            System.out.println("Nenhum aluno cadastrado na base de dados!");
-        } else {
-            System.out.println(String.format("Alunos encontrados: %d", alunos.size()));
-            for (Aluno aluno : alunos) {
-                System.out.println(String.format("#%d CPF: %s - Nome: %s", aluno.getId(), aluno.getCpf(), aluno.getNome()));
-            }
+        System.out.print("Nome do curso: ");
+        String nome = TecladoUtil.leitura().trim();
+        if (!TecladoUtil.confirmar("Deseja realmente excluir este curso")) {
+            System.out.println("Exclusão cancelada pelo usuário.");
+            return;
         }
-        System.out.println();
+        cursoService.remover(nome);
     }
 
+    /** Método para listar alunos */
+    private static void listarAlunos() {
+        alunoService.listar();
+    }
+
+    /** Método para listar cursos */
     private static void listarCursos() {
         cursoService.listarComAlunos();
     }
 
+    /** Método para realizar matrícula de um aluno em um curso */
     private static void realizarMatricula() {
-        System.out.println(OpcaoMenu.REALIZAR_MATRICULA.getDescricao());
-        alunoService.matricular();
+        matriculaService.matricularAluno();
     }
 
+    /** Método para cancelar matrícula de um aluno em um curso */
     private static void cancelarMatricula() {
-        System.out.println(OpcaoMenu.CANCELAR_MATRICULA.getDescricao());
-        alunoService.cancelarMatricula();
-    }
-
-    private static void fecharRecursos() {
-        scanner.close();
+        matriculaService.cancelarMatricula();
     }
 }
